@@ -18,9 +18,18 @@ public class CatalogServiceHandler implements EventHandler {
 
 	@After(event = CdsService.EVENT_READ)
 	public void discountBooks(Stream<Books> books) {
-		books.filter(b -> b.getTitle() != null && b.getStock() != null)
-		.filter(b -> b.getStock() > 200)
-		.forEach(b -> b.setTitle(b.getTitle() + " (discounted)"));
+		books
+				.filter(this::discountEligible)
+				.forEach(this::discontBooks);
 	}
 
+	private boolean discountEligible(Books books) {
+		return books.getTitle() != null
+				&& books.getStock() != null
+				&& books.getStock() > 200;
+	}
+
+	private void discontBooks(Books books) {
+		books.setTitle(books.getTitle() + " (discounted)");
+	}
 }
